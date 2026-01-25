@@ -3,7 +3,7 @@ from datetime import time
 # -------------------------
 # Data / Replay
 # -------------------------
-CSV_PATH = "smart_plug_stream.csv"
+CSV_PATH = "data/smart_plug_stream.csv"
 TICK_MS = 1500               # faster for demo
 REPLAY_STEP_ROWS = 25        # rows per tick (controls speed)
 

@@ -17,8 +17,12 @@ Columns:
 from datetime import datetime, timedelta
 import pandas as pd
 import random
+import os
+import sys
 
-from config import CSV_PATH, DEMO_DORM
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+
+from app.config import CSV_PATH, DEMO_DORM
 
 random.seed(7)
 
