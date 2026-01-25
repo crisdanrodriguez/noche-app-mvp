@@ -137,7 +137,7 @@ def leaderboard_card(df_lb: pd.DataFrame):
         ))
 
     return card([
-        html.Div(["🏆 ", html.Span("Leaderboard", style={"fontWeight": 900, "fontSize": "18px", "color": TEXT})], style={"marginBottom": "10px"}),
+        html.Div(["🏆 ", html.Span("Weekly Leaderboard", style={"fontWeight": 900, "fontSize": "18px", "color": TEXT})], style={"marginBottom": "10px"}),
         html.Div(rows)
     ])
 
@@ -171,11 +171,38 @@ def live_badge(live_time_text: str):
         style={"fontSize": "12px"},
     )
 
+def tips_card(title: str, body: str, variant: str):
+    styles = {
+        "green": {"bg": "#f1faf4", "border": "#a7d7b8"},
+        "peak": {"bg": "#fdf3f3", "border": "#f2b4b4"},
+        "neutral": {"bg": "#f6f7f8", "border": "#d1d5db"},
+    }
+    s = styles.get(variant, styles["neutral"])
 
-def tips_card(tip_title: str, tip_body: str):
-    return card([
-        html.Div("💡 Tip", style={"fontWeight": 900, "color": TEXT, "fontSize": "16px", "marginBottom": "8px"}),
-        html.Div(tip_title, style={"fontWeight": 900, "color": TEXT, "fontSize": "14px"}),
-        html.Div(tip_body, style={"color": "#51615c", "fontSize": "14px", "lineHeight": "1.5", "marginTop": "6px"})
-    ], padding="16px")
+    return html.Div(
+        card(
+            [
+                html.Div(title, style={"fontWeight": 900, "fontSize": "15px"}),
+                html.Div(
+                    body,
+                    style={
+                        "fontSize": "13px",
+                        "lineHeight": "1.45",
+                        "marginTop": "8px",
+                    },
+                ),
+            ],
+            padding="16px 16px",
+        ),
+        style={
+            "background": s["bg"],
+            "border": f"1px solid {s['border']}",
+            "borderRadius": "16px",
+            "height": "100%",
+        },
+    )
+
+
+
+
 

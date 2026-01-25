@@ -26,3 +26,9 @@ body {
   background: rgba(22, 163, 74, 0.10);
   border: 1px solid rgba(22, 163, 74, 0.18);
 }
+
+.tip-card {
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+}
+
+
