@@ -1,10 +1,8 @@
-/* Smooth font rendering */
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* LIVE dot pulse */
 @keyframes livePulse {
   0% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.35; transform: scale(0.92); }
@@ -16,7 +14,6 @@ body {
   animation: livePulse 1.15s infinite ease-in-out;
 }
 
-/* Optional: tiny chip style for "LIVE" */
 .live-chip {
   display: inline-flex;
   align-items: center;
@@ -26,9 +23,3 @@ body {
   background: rgba(22, 163, 74, 0.10);
   border: 1px solid rgba(22, 163, 74, 0.18);
 }
-
-.tip-card {
-  transition: background-color 0.35s ease, border-color 0.35s ease;
-}
-
-
