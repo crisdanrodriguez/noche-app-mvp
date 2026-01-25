@@ -1,14 +1,15 @@
 from datetime import time
 
 # =========================
-# Data / Replay
+# Demo / Replay
 # =========================
-CSV_PATH = "data/smart_plug_stream.csv"
+CSV_PATH = "smart_plug_stream.csv"
 TICK_MS = 3000
 REPLAY_STEP_ROWS = 10
 
-DEMO_DORM = "Trojans Hall - 4B"
 DEMO_USER_NAME = "Alex"
+DEMO_DORM = "Trojans Hall - 4B"
+DEMO_LOCATION = "USC Campus"
 
 # =========================
 # Time windows (MVP)
@@ -20,11 +21,17 @@ BUSY_START  = time(17, 0)
 BUSY_END    = time(21, 0)
 
 # =========================
-# Points per kWh
+# Points per kWh (simple + explainable)
 # =========================
-POINTS_GREEN   = 50
-POINTS_NEUTRAL = 10
-POINTS_BUSY    = -5
+POINTS_GREEN  = 150
+POINTS_NORMAL = 100
+POINTS_BUSY   = 70
+
+# =========================
+# Streak (simple)
+# =========================
+STREAK_GOAL_DAYS = 10         # progress bar goal
+MAX_STREAK_BONUS_PCT = 30     # max bonus at goal
 
 # =========================
 # UI Styling
@@ -44,6 +51,9 @@ GREEN_LIGHT = "#b7e1c1"
 RED = "#c62828"
 RED_LIGHT = "#f5b5b5"
 
-GREY = "#cfd8d3"  
+GREY = "#cfd8d3"
+
+YELLOW = "#facc15"
+ORANGE = "#fb923c"
 
 FONT_FAMILY = "Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial"

@@ -1,160 +1,47 @@
 import dash
-from dash import html, dcc, Output, Input, State
+from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 
 from config import (
     BG, BORDER, SHADOW, FONT_FAMILY,
     CSV_PATH, TICK_MS, REPLAY_STEP_ROWS,
-    DEMO_DORM, DEMO_USER_NAME,
-    GREEN, GREEN_LIGHT, RED, RED_LIGHT,
-    TEXT, MUTED,
-)
-from data_service import load_data, compute_metrics
-from ui_components import (
-    card, progress_card, streak_card, leaderboard_card, energy_pct_chart, live_badge
+    DEMO_DORM, DEMO_USER_NAME, DEMO_LOCATION,
+    GREEN_START, GREEN_END, BUSY_START, BUSY_END,
+    STREAK_GOAL_DAYS
 )
 
-data, daily = load_data(CSV_PATH)
+from data_service import load_data, compute_daily_table, compute_metrics
+from ui_components import (
+    header_block,
+    live_location_card,
+    points_card,
+    kwh_usage_card,
+    streak_card,
+    weekly_challenges_card,
+    leaderboard_card,
+)
+
+# Load data once at startup
+df = load_data(CSV_PATH)
+daily = compute_daily_table(df)
 
 external_stylesheets = [
     dbc.themes.FLATLY,
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap",
 ]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-app.title = "Noche (MVP)"
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = "EcoEnergy Challenge (USC Dorm MVP)"
 
-ROW1_H = "170px"
-ROW2_H = "120px"
-ROW3_H = "300px"
-ROW4_H = "210px"
-
-def brand_header():
-    return html.Div(
-        style={
-            "padding": "26px 16px 14px 16px",
-            "borderBottom": f"1px solid {BORDER}",
-            "background": "linear-gradient(180deg, #eaf6ee 0%, #ffffff 88%)",
-            "textAlign": "center",
-        },
-        children=[
-            html.Div("Noche", style={"fontSize": "40px", "fontWeight": 900, "color": "#1f5c3a", "letterSpacing": "-0.0px"}),
-            html.Div("To a greener future", style={"fontSize": "25px", "fontWeight": 900, "color": "#1f5c3a", "letterSpacing": "-0.0px"}),
-        ],
-    )
-
-def live_location_card(live_time_text: str, location_text: str, dorm_text: str, members: int):
-    return card(
-        [
-            html.Div("Time", style={"fontWeight": 900, "color": MUTED, "fontSize": "12px"}),
-            html.Div(live_badge(live_time_text), style={"marginTop": "8px"}),
-
-            html.Div(style={"height": "10px"}),
-
-            html.Div("Location", style={"fontWeight": 900, "color": MUTED, "fontSize": "12px"}),
-            html.Div(location_text, style={"fontWeight": 900, "color": TEXT, "marginTop": "4px"}),
-
-            html.Div(style={"height": "10px"}),
-
-            html.Div("Dorm / Group", style={"fontWeight": 900, "color": MUTED, "fontSize": "12px"}),
-            html.Div(dorm_text, style={"fontWeight": 900, "color": TEXT, "marginTop": "4px"}),
-            html.Div(f"{members} students", style={"color": MUTED, "fontSize": "12px", "marginTop": "2px"}),
-        ],
-        padding="16px 16px",
-    )
-
-def todays_points_card(points: int, replay_text: str, completed: int, total: int):
-    frac = 0 if total == 0 else max(0, min(completed / total, 1))
-    return card(
-        [
-            html.Div(
-                [
-                    html.Div("Today's Points", style={"fontWeight": 800, "color": MUTED, "fontSize": "13px"}),
-                    html.Div(
-                        f"Daily Challenges {completed}/{total}",
-                        style={"fontWeight": 900, "color": "#1f5c3a", "fontSize": "13px"},
-                    ),
-                ],
-                style={"display": "flex", "justifyContent": "space-between", "alignItems": "baseline"},
-            ),
-            html.Div(
-                f"{points} pts",
-                style={"fontWeight": 900, "fontSize": "44px", "lineHeight": "1.0", "marginTop": "10px", "color": TEXT},
-            ),
-            html.Div(replay_text, style={"color": MUTED, "fontSize": "12px", "marginTop": "8px"}),
-
-            html.Div(style={"height": "10px"}),
-            html.Div(
-                style={"height": "10px", "background": "#e9efec", "borderRadius": "999px", "overflow": "hidden"},
-                children=[
-                    html.Div(
-                        style={
-                            "height": "100%",
-                            "width": f"{int(frac * 100)}%",
-                            "background": "linear-gradient(90deg, #2e7d32 0%, #b7e1c1 100%)",
-                            "transition": "width 0.5s ease",
-                        }
-                    )
-                ],
-            ),
-        ],
-        padding="16px 16px",
-    )
-
-def weekly_challenges_panel(completed: int, total: int, items: list[tuple[str, str]]):
-    return card(
-        [
-            html.Div(
-                [
-                    html.Div("Weekly Challenges", style={"fontWeight": 900, "fontSize": "18px", "color": TEXT}),
-                    html.Div(f"{completed} / {total} completed", style={"color": MUTED, "fontWeight": 800}),
-                ],
-                style={"display": "flex", "justifyContent": "space-between", "alignItems": "baseline"},
-            ),
-            html.Div(style={"height": "10px"}),
-
-            dbc.Button(
-                "View Weekly Challenges ▸",
-                id="btn_weekly",
-                color="primary",
-                size="sm",
-                style={"borderRadius": "999px", "fontWeight": 800},
-            ),
-
-            dbc.Collapse(
-                id="collapse_weekly",
-                is_open=False,
-                children=[
-                    html.Div(style={"height": "12px"}),
-                    html.Div(
-                        [
-                            html.Div(
-                                [
-                                    html.Span("✅ " if status == "done" else "⛔ "),
-                                    html.Span(text, style={"fontWeight": 800 if status == "done" else 700}),
-                                ],
-                                style={
-                                    "padding": "10px 10px",
-                                    "border": f"1px solid {BORDER}",
-                                    "borderRadius": "12px",
-                                    "marginBottom": "8px",
-                                    "background": "#eefaf1" if status == "done" else "white",
-                                },
-                            )
-                            for status, text in items
-                        ]
-                    ),
-                ],
-            ),
-        ],
-        padding="16px 16px",
-    )
+ROW1_H = "185px"
+ROW2_H = "140px"
+ROW3_H = "360px"
 
 app.layout = html.Div(
     style={"background": BG, "minHeight": "100vh", "padding": "18px", "fontFamily": FONT_FAMILY},
     children=[
         dcc.Interval(id="tick", interval=TICK_MS, n_intervals=0),
         dcc.Store(id="replay_idx", data=0),
-        dcc.Store(id="prev_rank", data=None),
+        dcc.Store(id="prev_ranks", data={}),
 
         html.Div(
             style={
@@ -167,8 +54,7 @@ app.layout = html.Div(
                 "boxShadow": SHADOW,
             },
             children=[
-                brand_header(),
-                html.Div(f"Welcome, {DEMO_USER_NAME}!", style={"fontSize": "20px", "fontWeight": 800, "color": TEXT, "marginTop": "10px", "paddingLeft": "2%"}),
+                header_block(company="EcoEnergy", user=DEMO_USER_NAME),
                 html.Div(style={"padding": "16px 18px 20px 18px"}, children=[
                     html.Div(id="main_content"),
                 ]),
@@ -184,158 +70,154 @@ app.layout = html.Div(
 )
 def advance_replay(_, idx):
     idx = int(idx) + REPLAY_STEP_ROWS
-    if idx >= len(data) - 1:
+    if idx >= len(df) - 1:
         idx = 0
     return idx
 
 @app.callback(
     Output("main_content", "children"),
-    Output("prev_rank", "data"),
+    Output("prev_ranks", "data"),
     Input("replay_idx", "data"),
-    State("prev_rank", "data"),
+    State("prev_ranks", "data"),
 )
-def render(replay_idx, prev_rank):
-    m = compute_metrics(data, daily, replay_idx, DEMO_DORM)
-
-    # rank movement (dorm ranking)
-    rank = m["rank"]
-    rank_delta = None
-    if prev_rank is not None and rank is not None:
-        rank_delta = prev_rank - rank
-    if rank is None:
-        rank_move = "—"
-    elif not rank_delta:
-        rank_move = "—"
-    elif rank_delta > 0:
-        rank_move = f"↑{rank_delta}"
-    else:
-        rank_move = f"↓{abs(rank_delta)}"
+def render(replay_idx, prev_ranks):
+    m = compute_metrics(df, daily, replay_idx, DEMO_DORM)
 
     live_time_text = m["current_ts"].strftime("%I:%M %p").lstrip("0")
-    location_text = "USC Campus"
-    dorm_text = DEMO_DORM
     members = m["members"]
 
-    daily_total = 3
-    daily_completed = int(m["solar_completed"]) + int(m["busy_completed"]) + int(m["green_over_busy_completed"])
+    # Leaderboard movement arrows (tick-to-tick)
+    weekly_lb = m["weekly_leaderboard"].copy()
+    current_ranks = {row["dorm"]: int(i + 1) for i, row in weekly_lb.reset_index(drop=True).iterrows()}
 
-    todays_points = todays_points_card(
-        points=m["score_pts"],
-        replay_text=f"Replay: Day {m['day_num']} / {m['total_days']}  •  Dorm rank: #{rank} ({rank_move})",
-        completed=daily_completed,
-        total=daily_total,
-    )
+    arrows = {}
+    for dorm_name, rank_now in current_ranks.items():
+        rank_prev = prev_ranks.get(dorm_name)
+        if rank_prev is None:
+            arrows[dorm_name] = {"symbol": "=", "color": "#94a3b8"}
+        else:
+            delta = rank_prev - rank_now
+            if delta > 0:
+                arrows[dorm_name] = {"symbol": "↑", "color": "#16a34a"}
+            elif delta < 0:
+                arrows[dorm_name] = {"symbol": "↓", "color": "#dc2626"}
+            else:
+                arrows[dorm_name] = {"symbol": "=", "color": "#94a3b8"}
 
-    weekly_items = [
-        ("done", "Shift 2 heavy loads into Green Hours (as a dorm)"),
-        ("done", "Keep Busy Hours under 2.0 kWh / student for 2 days"),
-        ("todo", "Achieve 5 Green>Busy days"),
-        ("todo", "Reduce Busy Hours by 10% vs last week"),
-        ("todo", "Complete 3 Solar Champion days"),
-    ]
-    weekly_completed = sum(1 for s, _ in weekly_items if s == "done")
-    weekly_total = len(weekly_items)
+    next_prev_ranks = current_ranks
 
+    green_window_text = f"{GREEN_START.strftime('%I:%M %p').lstrip('0')} – {GREEN_END.strftime('%I:%M %p').lstrip('0')}"
+    busy_window_text = f"{BUSY_START.strftime('%I:%M %p').lstrip('0')} – {BUSY_END.strftime('%I:%M %p').lstrip('0')}"
+
+    # Row 1
     row1 = dbc.Row(
         [
-            dbc.Col(html.Div(live_location_card(live_time_text, location_text, dorm_text, members),
-                             style={"height": "100%", "minHeight": ROW1_H}),
-                    md=4, xs=12),
-            dbc.Col(html.Div(todays_points, style={"height": "100%", "minHeight": ROW1_H}),
-                    md=5, xs=12),
-            dbc.Col(html.Div(streak_card(m["streak"], bonus_pct=25),
-                             style={"height": "100%", "minHeight": ROW1_H}),
-                    md=3, xs=12),
+            dbc.Col(
+                html.Div(
+                    live_location_card(live_time_text, DEMO_LOCATION, DEMO_DORM, members),
+                    style={"height": "100%", "minHeight": ROW1_H},
+                ),
+                md=4, xs=12
+            ),
+            dbc.Col(
+                html.Div(
+                    points_card(
+                        daily_points=m["daily_points"],
+                        weekly_points=m["weekly_points"],
+                        weekly_bonus_points=m["weekly_bonus_points"],
+                        day_label=m["day_label"],
+                        week_text=m["week_text"],
+                    ),
+                    style={"height": "100%", "minHeight": ROW1_H},
+                ),
+                md=5, xs=12
+            ),
+            dbc.Col(
+                html.Div(
+                    streak_card(
+                        streak_days=m["streak_days"],
+                        progress=m["streak_progress"],
+                        bonus_pct=m["bonus_pct"],
+                        goal_days=STREAK_GOAL_DAYS,
+                    ),
+                    style={"height": "100%", "minHeight": ROW1_H},
+                ),
+                md=3, xs=12
+            ),
         ],
         className="g-3",
         align="stretch",
     )
 
+    # Row 2
     row2 = dbc.Row(
         [
-            dbc.Col(html.Div(progress_card("Green Hours Usage", m["green_kwh"], "10 AM – 3 PM", GREEN, GREEN_LIGHT, vmax=4.0),
-                             style={"height": "100%", "minHeight": ROW2_H}),
-                    md=6, xs=12),
-            dbc.Col(html.Div(progress_card("Busy Hours Usage", m["busy_kwh"], "5 PM – 9 PM", RED, RED_LIGHT, vmax=4.0),
-                             style={"height": "100%", "minHeight": ROW2_H}),
-                    md=6, xs=12),
+            dbc.Col(
+                html.Div(
+                    kwh_usage_card(
+                        title="Green Hours Usage (per student)",
+                        window_text=green_window_text,
+                        kwh=m["green_kwh"],
+                        pct=m["pct_green"],
+                        color="#2e7d32",
+                        color_light="#b7e1c1"
+                    ),
+                    style={"height": "100%", "minHeight": ROW2_H},
+                ),
+                md=6, xs=12
+            ),
+            dbc.Col(
+                html.Div(
+                    kwh_usage_card(
+                        title="Busy Hours Usage (per student)",
+                        window_text=busy_window_text,
+                        kwh=m["busy_kwh"],
+                        pct=m["pct_busy"],
+                        color="#c62828",
+                        color_light="#f5b5b5"
+                    ),
+                    style={"height": "100%", "minHeight": ROW2_H},
+                ),
+                md=6, xs=12
+            ),
         ],
         className="g-3",
         align="stretch",
     )
 
-    graph_card = card(
-        [
-            html.Div(
-                [
-                    html.Div("Today: Green vs Busy", style={"fontWeight": 900, "color": TEXT}),
-                ],
-                style={
-                    "display": "flex",
-                    "justifyContent": "space-between",
-                    "alignItems": "baseline",
-                    "marginBottom": "8px",
-                    "flex": "0 0 auto",
-                    "width": "100%",
-                },
-            ),
-
-            # Wrapper flex que obliga a ocupar TODO el espacio restante
-            html.Div(
-                dcc.Graph(
-                    id="today_pct",
-                    figure=energy_pct_chart(m["green_kwh"], m["busy_kwh"], m["normal_kwh"]),
-                    config={"displayModeBar": False, "responsive": True},
-                    style={"width": "100%", "height": "100%"},
-                ),
-                style={
-                    "flex": "1 1 auto",
-                    "minHeight": 0,   # MUY importante en flex
-                    "width": "100%",
-                },
-            ),
-        ],
-        padding="14px 14px",
-    )
-
+    # Row 3: Weekly challenges + leaderboard
     row3 = dbc.Row(
         [
             dbc.Col(
-                html.Div(graph_card, style={"height": "100%", "minHeight": ROW3_H, "width": "100%", "display": "flex"}),
+                html.Div(
+                    weekly_challenges_card(
+                        challenges=m["weekly_challenges"],
+                        completed=m["weekly_completed"],
+                        total=m["weekly_total"],
+                    ),
+                    style={"height": "100%", "minHeight": ROW3_H},
+                ),
                 md=6, xs=12
             ),
-            dbc.Col(html.Div(leaderboard_card(m["leaderboard"], DEMO_DORM), style={"height": "100%", "minHeight": ROW3_H}),
-                    md=6, xs=12),
+            dbc.Col(
+                html.Div(
+                    leaderboard_card(
+                        df_lb=m["weekly_leaderboard"],
+                        selected_dorm=DEMO_DORM,
+                        arrows=arrows,
+                        target_rows=10
+                    ),
+                    style={"height": "100%", "minHeight": ROW3_H},
+                ),
+                md=6, xs=12
+            ),
         ],
         className="g-3",
         align="stretch",
     )
 
-    row4 = dbc.Row(
-        [
-            dbc.Col(html.Div(weekly_challenges_panel(weekly_completed, weekly_total, weekly_items),
-                             style={"height": "100%", "minHeight": ROW4_H}),
-                    md=12, xs=12),
-        ],
-        className="g-3",
-        align="stretch",
-    )
-
-    layout = html.Div([row1, html.Div(style={"height": "10px"}), row2,
-                       html.Div(style={"height": "10px"}), row3,
-                       html.Div(style={"height": "10px"}), row4])
-
-    return layout, rank
-
-@app.callback(
-    Output("collapse_weekly", "is_open"),
-    Input("btn_weekly", "n_clicks"),
-    State("collapse_weekly", "is_open"),
-)
-def toggle_weekly(n, is_open):
-    if n:
-        return not is_open
-    return is_open
+    content = html.Div([row1, html.Div(style={"height": "10px"}), row2, html.Div(style={"height": "10px"}), row3])
+    return content, next_prev_ranks
 
 if __name__ == "__main__":
     app.run(debug=True, port=8050)
