@@ -6,8 +6,7 @@ from config import (
     BG, BORDER, SHADOW, FONT_FAMILY,
     CSV_PATH, TICK_MS, REPLAY_STEP_ROWS,
     DEMO_DORM, DEMO_USER_NAME, DEMO_LOCATION,
-    GREEN_START, GREEN_END, BUSY_START, BUSY_END,
-    STREAK_GOAL_DAYS
+    GREEN_START, GREEN_END, BUSY_START, BUSY_END, TEXT,
 )
 
 from data_service import load_data, compute_daily_table, compute_metrics
@@ -21,7 +20,9 @@ from ui_components import (
     leaderboard_card,
 )
 
-# Load data once at startup
+# -------------------------
+# Load CSV once at startup
+# -------------------------
 df = load_data(CSV_PATH)
 daily = compute_daily_table(df)
 
@@ -29,10 +30,11 @@ external_stylesheets = [
     dbc.themes.FLATLY,
     "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap",
 ]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-app.title = "EcoEnergy Challenge (USC Dorm MVP)"
 
-ROW1_H = "185px"
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.title = "Noche MVP"
+
+ROW1_H = "200px"
 ROW2_H = "140px"
 ROW3_H = "360px"
 
@@ -54,7 +56,9 @@ app.layout = html.Div(
                 "boxShadow": SHADOW,
             },
             children=[
-                header_block(company="EcoEnergy", user=DEMO_USER_NAME),
+                header_block(company="Noche", user=DEMO_USER_NAME),
+                html.Div(f"Welcome, {DEMO_USER_NAME}!", style={"fontSize": "20px", "fontWeight": 800, "color": TEXT, "marginTop": "6px",
+                                                               "paddingLeft": "25px"}),
                 html.Div(style={"padding": "16px 18px 20px 18px"}, children=[
                     html.Div(id="main_content"),
                 ]),
@@ -86,9 +90,10 @@ def render(replay_idx, prev_ranks):
     live_time_text = m["current_ts"].strftime("%I:%M %p").lstrip("0")
     members = m["members"]
 
-    # Leaderboard movement arrows (tick-to-tick)
-    weekly_lb = m["weekly_leaderboard"].copy()
-    current_ranks = {row["dorm"]: int(i + 1) for i, row in weekly_lb.reset_index(drop=True).iterrows()}
+    # Full weekly leaderboard for movement arrows
+    weekly_lb = m["weekly_leaderboard"].reset_index(drop=True).copy()
+
+    current_ranks = {row["dorm"]: int(i + 1) for i, row in weekly_lb.iterrows()}
 
     arrows = {}
     for dorm_name, rank_now in current_ranks.items():
@@ -109,7 +114,6 @@ def render(replay_idx, prev_ranks):
     green_window_text = f"{GREEN_START.strftime('%I:%M %p').lstrip('0')} – {GREEN_END.strftime('%I:%M %p').lstrip('0')}"
     busy_window_text = f"{BUSY_START.strftime('%I:%M %p').lstrip('0')} – {BUSY_END.strftime('%I:%M %p').lstrip('0')}"
 
-    # Row 1
     row1 = dbc.Row(
         [
             dbc.Col(
@@ -138,7 +142,6 @@ def render(replay_idx, prev_ranks):
                         streak_days=m["streak_days"],
                         progress=m["streak_progress"],
                         bonus_pct=m["bonus_pct"],
-                        goal_days=STREAK_GOAL_DAYS,
                     ),
                     style={"height": "100%", "minHeight": ROW1_H},
                 ),
@@ -149,7 +152,6 @@ def render(replay_idx, prev_ranks):
         align="stretch",
     )
 
-    # Row 2
     row2 = dbc.Row(
         [
             dbc.Col(
@@ -185,7 +187,6 @@ def render(replay_idx, prev_ranks):
         align="stretch",
     )
 
-    # Row 3: Weekly challenges + leaderboard
     row3 = dbc.Row(
         [
             dbc.Col(
@@ -202,10 +203,10 @@ def render(replay_idx, prev_ranks):
             dbc.Col(
                 html.Div(
                     leaderboard_card(
-                        df_lb=m["weekly_leaderboard"],
+                        df_lb=weekly_lb,
                         selected_dorm=DEMO_DORM,
                         arrows=arrows,
-                        target_rows=10
+                        target_rows=8
                     ),
                     style={"height": "100%", "minHeight": ROW3_H},
                 ),
@@ -216,8 +217,16 @@ def render(replay_idx, prev_ranks):
         align="stretch",
     )
 
-    content = html.Div([row1, html.Div(style={"height": "10px"}), row2, html.Div(style={"height": "10px"}), row3])
+    content = html.Div([
+        row1,
+        html.Div(style={"height": "10px"}),
+        row2,
+        html.Div(style={"height": "10px"}),
+        row3
+    ])
+
     return content, next_prev_ranks
 
+
 if __name__ == "__main__":
-    app.run(debug=True, port=8050)
+    app.run(debug=False, port=8040)

@@ -1,25 +1,20 @@
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.live-chip{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(22,163,74,0.10);
+  border:1px solid rgba(22,163,74,0.18);
 }
 
-@keyframes livePulse {
-  0%   { opacity: 1;   transform: scale(1); }
-  50%  { opacity: 0.35; transform: scale(0.92); }
-  100% { opacity: 1;   transform: scale(1); }
+.live-dot{
+  animation:pulse 1.2s ease-in-out infinite;
+  font-weight:900;
 }
 
-.live-dot {
-  display: inline-block;
-  animation: livePulse 1.15s infinite ease-in-out;
-}
-
-.live-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(22, 163, 74, 0.10);
-  border: 1px solid rgba(22, 163, 74, 0.18);
+@keyframes pulse{
+  0%{ opacity:0.25; transform:scale(0.95); }
+  50%{ opacity:1.0; transform:scale(1.12); }
+  100%{ opacity:0.25; transform:scale(0.95); }
 }
