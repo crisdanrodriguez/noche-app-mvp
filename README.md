@@ -1,18 +1,23 @@
+🔗 **Live Demo:** https://edb1b02f-3405-48b9-920e-8062b52a411b.plotly.app/
+*(Best viewed on desktop, live data replay enabled)*
+
+---
+
 # Noche — Energy Timing Gamification (MVP)
 
-Noche is a gamified energy platform that rewards users **not for using less energy**, but for using it **at the right time**.
+Noche is a gamified energy platform that rewards users not for using less energy, but for using it at the right time.
 
-This repository contains the **MVP User Dashboard**, designed for students living in dorms or shared apartments (e.g., USC housing). The app visualizes energy usage from smart plugs, highlights optimal usage windows, and drives behavior change through points, streaks, challenges, and leaderboards.
+This repository contains the MVP User Dashboard, designed for students living in dorms or shared apartments (e.g., USC housing). The app visualizes energy usage from smart plugs, highlights optimal usage windows, and drives behavior change through points, streaks, challenges, and leaderboards.
 
 ---
 
 ## ✨ Key Idea
 
-> **We don’t ask people to use less energy — we reward them for using it at the right time.**
+> **We don’t ask people to use less energy, instead we reward them for using it at the right time.**
 
 Noche aligns individual behavior with grid-friendly energy usage by:
-- Encouraging consumption during **Green Hours**
-- Discouraging usage during **Busy Hours**
+- Encouraging consumption during Green Hours
+- Discouraging usage during Busy Hours
 - Making energy timing visible, simple, and competitive
 
 ---
@@ -48,7 +53,7 @@ Noche aligns individual behavior with grid-friendly energy usage by:
 - **Normal Hours** → medium points
 - **Busy Hours** → penalty
 - **Weekly Challenges** → fixed bonus points
-- **Leaderboard** → compares points **per student**, not per dorm
+- **Leaderboard** → compares points per student, not per dorm
 
 ---
 
@@ -65,7 +70,7 @@ No backend or database is required for the MVP — all data is replayed from CSV
 ---
 
 ## 📁 Project Structure
-
+```
 noche_app_mvp/
 ├── app/
 │   ├── app.py
@@ -78,13 +83,14 @@ noche_app_mvp/
 │   └── demo_data.csv
 ├── requirements.txt
 └── README.md
-
+```
 ---
 
 ## ▶️ How to Run
 
 ```bash
 pip install -r requirements.txt
+python util/make_csv.py
 python app/app.py
 ```
 
