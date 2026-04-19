@@ -23,12 +23,12 @@ Interactive Dash MVP for exploring time-shifted residential energy usage with a 
 
 This repository contains a portfolio-ready MVP of an energy timing dashboard built with Dash and Plotly. The app replays simulated smart plug data from a CSV file and presents:
 
-- live usage playback
-- green-hours versus busy-hours consumption
-- daily and weekly points
-- streak progress
-- weekly challenges
-- a normalized dorm leaderboard
+- Live usage playback
+- Green-hours versus busy-hours consumption
+- Daily and weekly points
+- Streak progress
+- Weekly challenges
+- A normalized dorm leaderboard
 
 Scope is intentionally narrow. This project is a front-end MVP backed by generated CSV data, not a production backend or a real-time device integration.
 
@@ -104,9 +104,9 @@ origin_app_mvp/
 
 - Live demo: https://edb1b02f-3405-48b9-920e-8062b52a411b.plotly.app/
 - Delivered MVP behavior:
-  - simulated live playback from smart plug data
-  - per-student leaderboard normalization
-  - streak and challenge mechanics tied to energy timing
+  - Simulated live playback from smart plug data
+  - Per-student leaderboard normalization
+  - Streak and challenge mechanics tied to energy timing
 
 ## Documentation
 
@@ -132,8 +132,6 @@ The repository includes a lightweight GitHub Actions workflow that installs depe
 ## License
 
 No `LICENSE` file is currently included in this repository.
-
-If you want this project to be open for reuse, add a license explicitly rather than implying one in the README.
 
 ## AI Assistance and Last Updated
 
