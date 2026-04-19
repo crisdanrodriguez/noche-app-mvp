@@ -1,8 +1,9 @@
 from __future__ import annotations
+
 import pandas as pd
 from datetime import time
 
-from config import (
+from .config import (
     GREEN_START, GREEN_END, BUSY_START, BUSY_END,
     STREAK_GOAL_DAYS, MAX_STREAK_BONUS_PCT,
     DEMO_STREAK_BASE_DAYS
@@ -40,7 +41,7 @@ def label_window(ts: pd.Timestamp) -> str:
 def load_data(csv_path: str) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
     if df.empty:
-        raise ValueError("CSV is empty. Run make_csv.py or provide valid data.")
+        raise ValueError("CSV is empty. Run generate_demo_data.py or provide valid data.")
 
     required = {"ts", "dorm", "members", "power_w"}
     missing = required - set(df.columns)

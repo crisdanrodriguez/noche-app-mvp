@@ -1,6 +1,6 @@
 import pandas as pd
 from dash import html
-from config import (
+from .config import (
     BORDER, CARD_RADIUS, SHADOW_SOFT, TEXT, MUTED,
     YELLOW, ORANGE, GREEN, GREEN_LIGHT,
     STREAK_GOAL_DAYS

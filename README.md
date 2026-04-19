@@ -1,116 +1,142 @@
-🔗 **Live Demo:** https://edb1b02f-3405-48b9-920e-8062b52a411b.plotly.app/
+# Origin App MVP
 
-*(Best viewed on desktop, live data replay enabled)*
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Dash](https://img.shields.io/badge/Dash-2.17-0A0A0A?logo=plotly&logoColor=white)](https://dash.plotly.com/)
+[![Status](https://img.shields.io/badge/Status-MVP-2E7D32)](#overview)
+[![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
 
----
+Interactive Dash MVP for exploring time-shifted residential energy usage with a gamified student dashboard.
 
-# Noche — Energy Timing Gamification (MVP)
+## Table of Contents
 
-Noche is a gamified energy platform that rewards users not for using less energy, but for using it at the right time.
+- [Overview](#overview)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Results](#results)
+- [Documentation](#documentation)
+- [Development](#development)
+- [License](#license)
+- [AI Assistance and Last Updated](#ai-assistance-and-last-updated)
 
-This repository contains the MVP User Dashboard, designed for students living in dorms or shared apartments (e.g., USC housing). The app visualizes energy usage from smart plugs, highlights optimal usage windows, and drives behavior change through points, streaks, challenges, and leaderboards.
+## Overview
 
----
+This repository contains a portfolio-ready MVP of an energy timing dashboard built with Dash and Plotly. The app replays simulated smart plug data from a CSV file and presents:
 
-## ✨ Key Idea
+- live usage playback
+- green-hours versus busy-hours consumption
+- daily and weekly points
+- streak progress
+- weekly challenges
+- a normalized dorm leaderboard
 
-> **We don’t ask people to use less energy, instead we reward them for using it at the right time.**
+Scope is intentionally narrow. This project is a front-end MVP backed by generated CSV data, not a production backend or a real-time device integration.
 
-Noche aligns individual behavior with grid-friendly energy usage by:
-- Encouraging consumption during Green Hours
-- Discouraging usage during Busy Hours
-- Making energy timing visible, simple, and competitive
+## Installation
 
----
+### 1. Create and activate a virtual environment
 
-## 🚀 MVP Features
-
-### 👤 User Dashboard
-- **Live indicator** showing real-time / replayed energy data
-- **Green vs Busy Hours usage**
-  - kWh per student
-  - Percentage of daily usage
-- **Daily Points**
-  - Reset every day for immediate feedback
-- **Weekly Points**
-  - Accumulate across the week
-  - Used for competition
-- **Green Streak**
-  - Rewards consistent behavior over time
-  - Bonus increases as streak grows
-- **Weekly Challenges**
-  - Fixed dorm-level challenges
-  - Automatic reward allocation
-- **Leaderboard**
-  - Normalized per student (fair across dorm sizes)
-  - Rank movement indicators (up / down / same)
-  - Top 8 visible with user highlighted
-
----
-
-## 🧠 How Scoring Works (Simplified)
-
-- **Green Hours** → highest points (with streak bonus)
-- **Normal Hours** → medium points
-- **Busy Hours** → penalty
-- **Weekly Challenges** → fixed bonus points
-- **Leaderboard** → compares points per student, not per dorm
-
----
-
-## 🏗️ Tech Stack
-
-- **Python**
-- **Dash (Plotly)**
-- **Dash Bootstrap Components**
-- **Pandas**
-- **CSS (custom styling + animations)**
-
-No backend or database is required for the MVP — all data is replayed from CSV.
-
----
-
-## 📁 Project Structure
+```bash
+python -m venv .venv
+source .venv/bin/activate
 ```
-noche_app_mvp/
-├── app/
-│   ├── app.py
-│   ├── config.py
-│   ├── data_service.py
-│   ├── ui_components.py
-├── assets/
-│   └── style.css
-├── data/
-│   └── demo_data.csv
-├── requirements.txt
-└── README.md
-```
----
 
-## ▶️ How to Run
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
-python util/make_csv.py
-python app/app.py
 ```
 
-Then open: http://127.0.0.1:8040
+### 3. Regenerate the demo dataset if needed
 
----
+```bash
+python -m scripts.generate_demo_data
+```
 
-## 🧪 What This MVP Demonstrates
+## Usage
 
-- Behavioral energy nudging works without restricting usage
-- Gamification can shift demand away from busy hours
-- Normalizing per student makes competition fair
+Run the dashboard locally:
 
----
+```bash
+python -m app
+```
 
-## 🛣️ Future Work
+Then open `http://127.0.0.1:8040`.
 
-- Smart plug API integration
-- Admin dashboard for campuses
-- Forecast-driven recommendations
-- Mobile-first UI
+Notes:
 
+- The tracked file `data/smart_plug_stream.csv` is the default demo dataset.
+- You only need to regenerate the CSV when you want a fresh replay window.
+- The current MVP is optimized for desktop viewing.
+
+## Project Structure
+
+```text
+origin_app_mvp/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── app/
+│   ├── __main__.py
+│   ├── app.py
+│   ├── config.py
+│   ├── data_service.py
+│   └── ui_components.py
+├── assets/
+│   └── style.css
+├── data/
+│   └── smart_plug_stream.csv
+├── docs/
+│   └── architecture.md
+├── scripts/
+│   └── generate_demo_data.py
+├── tests/
+│   └── test_data_service.py
+├── .editorconfig
+├── .gitattributes
+├── .gitignore
+├── requirements-dev.txt
+├── requirements.txt
+└── README.md
+```
+
+## Results
+
+- Live demo: https://edb1b02f-3405-48b9-920e-8062b52a411b.plotly.app/
+- Delivered MVP behavior:
+  - simulated live playback from smart plug data
+  - per-student leaderboard normalization
+  - streak and challenge mechanics tied to energy timing
+
+## Documentation
+
+- [Architecture Notes](docs/architecture.md)
+
+## Development
+
+Install development dependencies:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run the basic quality checks:
+
+```bash
+python -m pytest
+python -m compileall app scripts
+```
+
+The repository includes a lightweight GitHub Actions workflow that installs dependencies, regenerates demo data, runs tests, and performs a compile smoke check.
+
+## License
+
+No `LICENSE` file is currently included in this repository.
+
+If you want this project to be open for reuse, add a license explicitly rather than implying one in the README.
+
+## AI Assistance and Last Updated
+
+This repository was reorganized with AI-assisted editing for structure, documentation, and baseline quality checks. The README and project layout were aligned against the current source tree rather than projected future features.
+
+Last updated: April 19, 2026.

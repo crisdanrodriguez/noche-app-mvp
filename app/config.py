@@ -1,11 +1,16 @@
 from datetime import time
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = ROOT_DIR / "data"
+ASSETS_DIR = ROOT_DIR / "assets"
 
 # -------------------------
 # Data / Replay
 # -------------------------
-CSV_PATH = "data/smart_plug_stream.csv"
-TICK_MS = 1500               # faster for demo
-REPLAY_STEP_ROWS = 25        # rows per tick (controls speed)
+CSV_PATH = DATA_DIR / "smart_plug_stream.csv"
+TICK_MS = 1500
+REPLAY_STEP_ROWS = 25
 
 # -------------------------
 # Demo Identity
@@ -47,6 +52,6 @@ FONT_FAMILY = "Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Ari
 # -------------------------
 # Streak (Reactive)
 # -------------------------
-DEMO_STREAK_BASE_DAYS = 56   # starting baseline
+DEMO_STREAK_BASE_DAYS = 56
 STREAK_GOAL_DAYS = 100
 MAX_STREAK_BONUS_PCT = 25
