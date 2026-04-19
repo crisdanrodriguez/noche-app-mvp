@@ -1,10 +1,5 @@
 # Origin App MVP
 
-[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Dash](https://img.shields.io/badge/Dash-2.17-0A0A0A?logo=plotly&logoColor=white)](https://dash.plotly.com/)
-[![Status](https://img.shields.io/badge/Status-MVP-2E7D32)](#overview)
-[![Tests](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)](.github/workflows/tests.yml)
-
 Interactive Dash MVP for exploring time-shifted residential energy usage with a gamified student dashboard.
 
 ## Table of Contents
