@@ -1,5 +1,9 @@
 # Origin App MVP
 
+[![Python](https://img.shields.io/badge/Python-3.11%2B-0A66C2?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Dash](https://img.shields.io/badge/Dash-2.17.1-0A66C2?style=flat-square&logo=plotly&logoColor=white)](https://dash.plotly.com/)
+[![Tests](https://img.shields.io/github/actions/workflow/status/crisdanrodriguez/noche-app-mvp/tests.yml?branch=main&style=flat-square&logo=githubactions&logoColor=white&label=Tests)](https://github.com/crisdanrodriguez/noche-app-mvp/actions/workflows/tests.yml)
+
 Interactive Dash MVP for exploring time-shifted residential energy usage with a gamified student dashboard.
 
 ## Table of Contents
@@ -70,7 +74,7 @@ Notes:
 origin_app_mvp/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       └── tests.yml
 ├── app/
 │   ├── __main__.py
 │   ├── app.py
